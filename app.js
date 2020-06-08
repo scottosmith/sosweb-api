@@ -11,6 +11,28 @@ const User = require('./models/user');
 const app = express();
 app.use(bodyParser.json());
 
+const posts = async (postIds) => {
+    try {
+        const matchedPosts = await Post.find({_id: {$in: postIds}});
+        return matchedPosts.map(post => {
+            return {...post._doc, author: user.bind(this, post.author)};
+        });
+    } 
+    catch (error) {
+        throw error;
+    }
+}
+
+const user = async (userId) => {
+    try {
+        const userMatch = await User.findById(userId);
+        return {...userMatch._doc, authoredPosts: posts.bind(this, userMatch.authoredPosts)};
+    } 
+    catch (error) {
+        throw error;
+    }
+}
+
 app.use('/api', graphqlHttp({
     schema: buildSchema(`
         type Post {
@@ -18,6 +40,7 @@ app.use('/api', graphqlHttp({
             title: String!
             body: String!
             date: String!
+            author: User!
         }
 
         type User {
@@ -26,6 +49,7 @@ app.use('/api', graphqlHttp({
             lastName: String!
             email: String!
             password: String
+            authoredPosts: [Post!]
         }
 
         input PostInput {
@@ -58,7 +82,11 @@ app.use('/api', graphqlHttp({
     rootValue: {
         posts: async () => {
             try {
-                return await Post.find()
+                const posts = await Post.find();
+                return posts.map(post => {
+                    const author = user.bind(this, post.author);
+                    return {...post._doc, author: author}
+                });
             } 
             catch (error) {
                 throw error;
@@ -109,10 +137,14 @@ app.use('/api', graphqlHttp({
     graphiql: true
 }));
 
-mongoose.connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWD}@cluster0-cbov3.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`)
-    .then(() => {
+const connect = async () => {
+    try {
+        await mongoose.connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWD}@cluster0-cbov3.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`);
         app.listen(6943);
         console.log('Server running...');
-    }).catch(err => {
-        console.log(err);
-    });
+    } 
+    catch (error) {
+        throw error;
+    }
+}
+connect();
