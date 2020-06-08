@@ -3,8 +3,10 @@ const bodyParser = require('body-parser');
 const graphqlHttp = require('express-graphql');
 const { buildSchema } = require('graphql');
 const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
 
-const Post = require('./models/post')
+const Post = require('./models/post');
+const User = require('./models/user');
 
 const app = express();
 app.use(bodyParser.json());
@@ -18,10 +20,25 @@ app.use('/api', graphqlHttp({
             date: String!
         }
 
+        type User {
+            _id: ID!
+            firstName: String!
+            lastName: String!
+            email: String!
+            password: String
+        }
+
         input PostInput {
             title: String!
             body: String!
             date: String!
+        }
+
+        input UserInput {
+            firstName: String!
+            lastName: String!
+            email: String!
+            password: String!
         }
 
         type RootQuery {
@@ -30,6 +47,7 @@ app.use('/api', graphqlHttp({
 
         type RootMutation {
             createPost(postInput: PostInput): Post
+            createUser(userInput: UserInput): User
         }
 
         schema {
@@ -38,28 +56,54 @@ app.use('/api', graphqlHttp({
         }
     `),
     rootValue: {
-        posts: () => {
-            return Post.find()
-            .then(posts => {
-                return posts.map(post => {
-                    return {...post._doc};
-                })
-            }).catch(err => {
-                throw err;
-            });
+        posts: async () => {
+            try {
+                return await Post.find()
+            } 
+            catch (error) {
+                throw error;
+            }
         },
-        createPost: args => {
-            const post = new Post({
-                title: args.postInput.title,
-                body: args.postInput.body,
-                date: new Date()
-            })
-            return post.save().then(result => {
-                return {...result._doc};
-            }).catch(err => {
-                console.log(err);
-                throw err;
-            });
+        createPost: async args => {
+            try {
+                const post = new Post({
+                    title: args.postInput.title,
+                    body: args.postInput.body,
+                    date: new Date(),
+                    author: '5eddc9b28643035b870107e2'
+                })
+                await post.save();
+                const user = await User.findById('5eddc9b28643035b870107e2');
+                if (!user) {
+                    throw new Error('User not found');
+                }
+                user.authoredPosts.push(post);
+                await user.save();
+                return post;
+            } 
+            catch (error) {
+                throw error;
+            }
+        },
+        createUser: async args => {
+            try {
+                const existingUser = await User.findOne({email: args.userInput.email});
+                if (existingUser) {
+                    throw new Error('Email already in use');
+                }
+                const hashPass = await bcrypt.hash(args.userInput.password, 12);
+                const user = new User({
+                    firstName: args.userInput.firstName,
+                    lastName: args.userInput.lastName,
+                    email: args.userInput.email,
+                    password: hashPass
+                });
+                await user.save();
+                return { ...user._doc, password: null };
+            } 
+            catch (error) {
+                throw error;
+            }
         }
     },
     graphiql: true
