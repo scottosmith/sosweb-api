@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const graphqlHttp = require('express-graphql');
 const { buildSchema } = require('graphql');
+const mongoose = require('mongoose');
 
 const app = express();
 
@@ -55,4 +56,9 @@ app.use('/api', graphqlHttp({
     graphiql: true
 }));
 
-app.listen(6943);
+mongoose.connect(process.env.DB_CONNECT)
+    .then(() => {
+        app.listen(6943);
+    }).catch(err => {
+        console.log(err);
+    });
