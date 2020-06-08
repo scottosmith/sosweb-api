@@ -5,8 +5,9 @@ module.exports = buildSchema(`
         _id: ID!
         title: String!
         body: String!
-        date: String!
         author: User!
+        createdAt: String!
+        updatedAt: String!
     }
 
     type User {
@@ -17,12 +18,13 @@ module.exports = buildSchema(`
         email: String!
         password: String
         authoredPosts: [Post!]
+        createdAt: String!
+        updatedAt: String!
     }
 
     input PostInput {
         title: String!
         body: String!
-        date: String!
     }
 
     input UserInput {

@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const Post = require('../../models/post');
 const User = require('../../models/user');
 
+//#region Lil Helpers
 const fullName = (fn, ln) => {
     if (ln) {
         return fn + ' ' + ln;
@@ -9,13 +10,18 @@ const fullName = (fn, ln) => {
     return fn;
 }
 
+const prettyDate = d => new Date(d).toISOString();
+//#endregion
+
+//#region Build Relationships <3
 const posts = async (postIds) => {
     try {
         const matchedPosts = await Post.find({_id: {$in: postIds}});
         return matchedPosts.map(post => {
             return {
                 ...post._doc,
-                date: new Date(post.date).toISOString(),
+                createdAt: prettyDate(post.createdAt),
+                updatedAt: prettyDate(post.updatedAt),
                 author: user.bind(this, post.author)
             };
         });
@@ -38,7 +44,9 @@ const user = async (userId) => {
         throw error;
     }
 }
+//#endregion
 
+//#region Export
 module.exports = {
     posts: async () => {
         try {
@@ -47,7 +55,8 @@ module.exports = {
                 const author = user.bind(this, post.author);
                 return {
                     ...post._doc, 
-                    date: new Date(post.date).toISOString(),
+                    createdAt: prettyDate(post.createdAt),
+                    updatedAt: prettyDate(post.updatedAt),
                     author: author
                 }
             });
@@ -61,19 +70,19 @@ module.exports = {
             const post = new Post({
                 title: args.postInput.title,
                 body: args.postInput.body,
-                date: new Date(),
                 author: '5eddc9b28643035b870107e2'
             })
             await post.save();
-            const user = await User.findById(post.author);
-            if (!user) {
+            const postAuthor = await User.findById(post.author);
+            if (!postAuthor) {
                 throw new Error('User not found');
             }
-            user.authoredPosts.push(post);
-            await user.save();
+            postAuthor.authoredPosts.push(post);
+            await postAuthor.save();
             return { 
                 ...post._doc, 
-                date: new Date(post.date).toISOString(),
+                createdAt: prettyDate(post.createdAt),
+                updatedAt: prettyDate(post.updatedAt),
                 author: user.bind(this, post.author)
             };
         } 
@@ -88,15 +97,17 @@ module.exports = {
                 throw new Error('Email already in use');
             }
             const hashPass = await bcrypt.hash(args.userInput.password, 12);
-            const user = new User({
+            const newUser = new User({
                 firstName: args.userInput.firstName,
                 lastName: args.userInput.lastName,
                 email: args.userInput.email,
                 password: hashPass
             });
-            await user.save();
+            await newUser.save();
             return { 
-                ...user._doc, 
+                ...newUser._doc,
+                createdAt: prettyDate(newUser.createdAt),
+                updatedAt: prettyDate(newUser.updatedAt),
                 password: null 
             };
         } 
@@ -105,3 +116,4 @@ module.exports = {
         }
     }
 }
+//#endregion
