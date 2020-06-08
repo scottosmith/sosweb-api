@@ -56,9 +56,14 @@ app.use('/api', graphqlHttp({
     graphiql: true
 }));
 
-mongoose.connect(process.env.DB_CONNECT)
-    .then(() => {
-        app.listen(6943);
-    }).catch(err => {
-        console.log(err);
-    });
+const connect = async () => {
+    try {
+        await mongoose.connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWD}@cluster0-cbov3.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`);
+        app.listen(process.env.DB_PORT);
+        console.log('Server running...');
+    } 
+    catch (error) {
+        throw error;
+    }
+}
+connect();
