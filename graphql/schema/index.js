@@ -36,6 +36,7 @@ module.exports = buildSchema(`
 
     type RootQuery {
         posts: [Post!]!
+        users: [User!]!
     }
 
     type RootMutation {
