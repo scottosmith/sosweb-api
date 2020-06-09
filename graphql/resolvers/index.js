@@ -14,7 +14,7 @@ const prettyDate = d => new Date(d).toISOString();
 //#endregion
 
 //#region Build Relationships <3
-const posts = async (postIds) => {
+const postRelation = async (postIds) => {
     try {
         const matchedPosts = await Post.find({_id: {$in: postIds}});
         return matchedPosts.map(post => {
@@ -22,7 +22,7 @@ const posts = async (postIds) => {
                 ...post._doc,
                 createdAt: prettyDate(post.createdAt),
                 updatedAt: prettyDate(post.updatedAt),
-                author: user.bind(this, post.author)
+                author: userRelation.bind(this, post.author)
             };
         });
     } 
@@ -31,13 +31,13 @@ const posts = async (postIds) => {
     }
 }
 
-const user = async (userId) => {
+const userRelation = async (userId) => {
     try {
         const userMatch = await User.findById(userId);
         return {
             ...userMatch._doc,
             fullName: fullName(userMatch.firstName, userMatch.lastName),
-            authoredPosts: posts.bind(this, userMatch.authoredPosts)
+            authoredPosts: postRelation.bind(this, userMatch.authoredPosts)
         };
     } 
     catch (error) {
@@ -52,12 +52,28 @@ module.exports = {
         try {
             const posts = await Post.find();
             return posts.map(post => {
-                const author = user.bind(this, post.author);
                 return {
                     ...post._doc, 
                     createdAt: prettyDate(post.createdAt),
                     updatedAt: prettyDate(post.updatedAt),
-                    author: author
+                    author: userRelation.bind(this, post.author)
+                }
+            });
+        } 
+        catch (error) {
+            throw error;
+        }
+    },
+    users: async () => {
+        try {
+            const users = await User.find();
+            return users.map(user => {
+                return {
+                    ...user._doc, 
+                    fullName: fullName(user.firstName, user.lastName),
+                    createdAt: prettyDate(user.createdAt),
+                    updatedAt: prettyDate(user.updatedAt),
+                    authoredPosts: postRelation.bind(this, user.authoredPosts)
                 }
             });
         } 
@@ -83,7 +99,7 @@ module.exports = {
                 ...post._doc, 
                 createdAt: prettyDate(post.createdAt),
                 updatedAt: prettyDate(post.updatedAt),
-                author: user.bind(this, post.author)
+                author: userRelation.bind(this, post.author)
             };
         } 
         catch (error) {
