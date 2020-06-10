@@ -1,6 +1,6 @@
 //#region Lil Helpers
 // Construct the fullName data
-exports.fullName = (fn, ln) => {
+export const fullName = (fn, ln) => {
     if (ln) {
         return fn + ' ' + ln;
     }
@@ -8,5 +8,5 @@ exports.fullName = (fn, ln) => {
 }
 
 // Cleanup the date as stored in mongo
-exports.prettyDate = d => new Date(d).toISOString();
+export const prettyDate = d => new Date(d).toISOString();
 //#endregion

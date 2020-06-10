@@ -1,16 +1,16 @@
-const express = require('express');
-const bodyParser = require('body-parser');
-const graphqlHttp = require('express-graphql');
-const mongoose = require('mongoose');
-const gqlSchema = require('./graphql/schema/index');
-const gqlResolvers = require('./graphql/resolvers/index');
+import express from 'express';
+import bodyParser from 'body-parser';
+import graphqlHttp from 'express-graphql';
+import mongoose from 'mongoose';
+import gqlResolver from './graphql/resolvers/index';
+import gqlSchema from './graphql/schema/index';
 
 const app = express();
 app.use(bodyParser.json());
 
 app.use('/api', graphqlHttp({
-    schema: gqlSchema,
-    rootValue: gqlResolvers,
+    schema: gqlSchema(),
+    rootValue: gqlResolver,
     graphiql: true
 }));
 
