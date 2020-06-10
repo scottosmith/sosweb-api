@@ -37,6 +37,7 @@ const gqlSchema = () => {
 
         type RootQuery {
             posts: [Post!]!
+            users: [User!]!
         }
 
         type RootMutation {
