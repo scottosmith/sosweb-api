@@ -18,7 +18,6 @@ export const users = async (args, request) => {
 
 export const createUser = async (args, request) => {
     try {
-        authorize(request);
         const existingUser = await User.findOne({email: args.userInput.email});
         if (existingUser) {
             throw new Error('Email already in use');
