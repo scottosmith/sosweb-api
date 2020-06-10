@@ -1,9 +1,9 @@
-const usersResolver = require('./users');
-const postsResolver = require('./posts');
+import * as usersResolver from './users';
+import * as postsResolver from './posts';
 
-const rootResolver = {
+const gqlResolver = {
     ...usersResolver,
     ...postsResolver
 }
 
-module.exports = rootResolver;
+export default gqlResolver;

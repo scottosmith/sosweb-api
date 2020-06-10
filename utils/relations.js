@@ -1,6 +1,6 @@
-const { fullName, prettyDate } = require('./helpers');
-const Post = require('../models/post');
-const User = require('../models/user');
+import { fullName, prettyDate } from './helpers';
+import Post from '../models/post';
+import User from '../models/user';
 
 //#region Build Relationships <3
 const postRelation = async (postIds) => {
@@ -28,7 +28,7 @@ const userRelation = async (userId) => {
 
 //#region Transformations
 // transform user data to new user object
-const transformUser = exports.transformUser = user => {
+export const transformUser = user => {
     return {
         ...user._doc, 
         fullName: fullName(user.firstName, user.lastName),
@@ -40,7 +40,7 @@ const transformUser = exports.transformUser = user => {
 }
 
 // transform post data to new post object
-const transformPost = exports.transformPost = post => {
+export const transformPost = post => {
     return {
         ...post._doc,
         createdAt: prettyDate(post.createdAt),
