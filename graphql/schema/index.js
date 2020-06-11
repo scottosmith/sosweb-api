@@ -23,6 +23,12 @@ const gqlSchema = () => {
             updatedAt: String!
         }
 
+        type Auth {
+            userId: ID!
+            token: String!
+            tokenExpiration: Int!
+        }
+
         input PostInput {
             title: String!
             body: String!
@@ -38,6 +44,7 @@ const gqlSchema = () => {
         type RootQuery {
             posts: [Post!]!
             users: [User!]!
+            login(email: String!, password: String!): Auth!
         }
 
         type RootMutation {
