@@ -16,7 +16,7 @@ export const users = async (args, request) => {
     }
 }
 
-export const createUser = async (args, request) => {
+export const createUser = async args => {
     try {
         const existingUser = await User.findOne({email: args.userInput.email});
         if (existingUser) {

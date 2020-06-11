@@ -22,7 +22,7 @@ export const createPost = async (args, request) => {
         const post = new Post({
             title: args.postInput.title,
             body: args.postInput.body,
-            author: '5eddc9b28643035b870107e2'
+            author: request.userId
         });
         await post.save();
         const postAuthor = await User.findById(post.author);

@@ -10,7 +10,7 @@ const isAuth = (request, response, next) => {
         return loginFailed();
     }
     const token = authHeader.split(' ')[1];
-    if (!token || token.isEmpty()) {
+    if (!token || token === '') {
         return loginFailed();
     }
     let decodedToken;
