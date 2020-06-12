@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { request } from 'express';
 import bodyParser from 'body-parser';
 import graphqlHttp from 'express-graphql';
 import mongoose from 'mongoose';
@@ -10,6 +10,15 @@ const app = express();
 
 app.use(bodyParser.json());
 
+app.use((request, response, next) => {
+    response.header('Access-Control-Allow-Origin', '*');
+    response.header('Access-Control-Allow-Methods', 'POST,GET,OPTIONS');
+    response.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    if (request.method === 'OPTIONS') {
+        return response.sendStatus(200);
+    }
+    next();
+});
 app.use(isAuth);
 
 app.use('/api', graphqlHttp({
