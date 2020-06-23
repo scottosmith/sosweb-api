@@ -5,7 +5,6 @@ import authorize from '../../utils/authorize';
 
 export const posts = async (args, request) => {
     try {
-        authorize(request);
         const posts = await Post.find();
         return posts.map(post => {
             return transformPost(post);
