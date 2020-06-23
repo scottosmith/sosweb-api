@@ -1,11 +1,11 @@
 import * as usersResolver from './users';
 import * as postsResolver from './posts';
-import * as authResolver from './auth';
+import * as loginResolver from './login';
 
 const gqlResolver = {
     ...usersResolver,
     ...postsResolver,
-    ...authResolver
+    ...loginResolver
 }
 
 export default gqlResolver;

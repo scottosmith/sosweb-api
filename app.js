@@ -4,7 +4,7 @@ import graphqlHttp from 'express-graphql';
 import mongoose from 'mongoose';
 import gqlResolver from './graphql/resolvers/index';
 import gqlSchema from './graphql/schema/index';
-import isAuth from './middleware/is-auth';
+import isAuthorized from './middleware/is-authorized';
 
 const app = express();
 
@@ -19,7 +19,7 @@ app.use((request, response, next) => {
     }
     next();
 });
-app.use(isAuth);
+app.use(isAuthorized);
 
 app.use('/api', graphqlHttp({
     schema: gqlSchema(),

@@ -1,5 +1,5 @@
 const authorize = (request) => {
-    if (!request.isAuth) {
+    if (!request.isAuthorized) {
         throw new Error("Unauthorized!");
     }
 }
