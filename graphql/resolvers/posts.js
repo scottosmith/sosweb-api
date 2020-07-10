@@ -36,3 +36,18 @@ export const createPost = async (args, request) => {
         throw error;
     }
 }
+
+export const removePost = async (args, request) => {
+    try {
+        authorize(request);
+        const post = await Post.findById(args.postId);
+        const postAuthor = await User.findById(post.author);
+        postAuthor.authoredPosts.pop(post);
+        await postAuthor.save();
+        await Post.findOneAndDelete({_id: args.postId});
+        return "Post Removed!";
+    } 
+    catch (error) {
+        throw error;
+    }
+}

@@ -49,6 +49,7 @@ const gqlSchema = () => {
 
         type RootMutation {
             createPost(postInput: PostInput): Post
+            removePost(postId: ID!): String!
             createUser(userInput: UserInput): User
         }
 
